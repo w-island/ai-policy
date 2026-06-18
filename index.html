@@ -307,6 +307,7 @@
         <a href="#tools">승인된 도구</a>
         <a href="#data">입력 금지 데이터</a>
         <a href="#api">API · 비밀 관리</a>
+        <a href="#providers">제공자별 설정 가이드</a>
         <a href="#code">코드 · GitHub</a>
         <a href="#agent">코딩 에이전트</a>
         <a href="#output">결과물 검수</a>
@@ -688,6 +689,172 @@ config/secrets.*</pre>
 
         <div class="alert warn">
           <div><b>키 노출이 의심되면</b>즉시 해당 키를 폐기 · 재발급하고 L3 담당자에게 보고합니다. GitHub에 올라간 키는 1분 안에 자동 봇이 훔쳐가서 청구서가 폭발할 수 있습니다.</div>
+        </div>
+      </section>
+
+      <!-- =================== PROVIDERS =================== -->
+      <section id="providers">
+        <div class="sec-head">
+          <h2>제공자별 권한 설정 가이드</h2>
+          <p>L0~L3 등급을 각 AI 도구에서 실제로 어떻게 구현하는지 정리했습니다.</p>
+        </div>
+
+        <!-- Anthropic -->
+        <h3 class="sub first">Anthropic (Claude)</h3>
+        <p>Claude는 ① <strong>API Console</strong>(개발용)과 ② <strong>Claude.ai · Claude Code</strong>(채팅 · 코딩 도구)의 권한 분리 방식이 다릅니다.</p>
+
+        <div class="card" style="margin-bottom:14px;">
+          <h4>① API Console <span class="badge gray" style="margin-left:8px;">console.anthropic.com</span></h4>
+          <p style="margin-top:10px;">3겹 구조: <strong>Organization → Workspaces → Roles</strong></p>
+          <ul>
+            <li><strong>Organization</strong> — 회사 단위. 결제 카드 1개, 전체 Spend limit</li>
+            <li><strong>Workspaces</strong> — 프로젝트별 분리. 각 워크스페이스마다 별도 키 · 별도 한도 · 별도 멤버</li>
+            <li><strong>Roles</strong> — Primary Owner / Admin / Billing / Developer / Member</li>
+          </ul>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>W-Island 등급</th><th>Anthropic Role</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>L3</strong> 관리자</td><td>Organization <strong>Primary Owner</strong></td><td>결제 · 멤버 · 한도 · 모든 워크스페이스 관리</td></tr>
+              <tr><td><strong>L2</strong> 팀장급</td><td>Organization <strong>Admin</strong> 또는 담당 Workspace Admin</td><td>키 발급 · 팀원 초대 · 사용량 확인</td></tr>
+              <tr><td><strong>L1</strong> 일반</td><td>특정 Workspace의 <strong>Developer</strong></td><td>그 워크스페이스 키만 사용. 다른 프로젝트 접근 X</td></tr>
+              <tr><td><strong>L0</strong> 외부</td><td>멤버로 초대 X</td><td>만료 API 키만 전달. 프로젝트 종료 시 키 폐기</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="sub" style="font-size:15px; margin-top:22px;">W-Island 추천 Workspace 구성</h4>
+        <pre class="cmd"><span class="c"># W-Island Organization 내부</span>
+ai-hub-prod      <span class="c"># 운영 · 실제 사용자 노출</span>
+ai-hub-dev       <span class="c"># 개발 · 디버깅 · 실험</span>
+vivoir           <span class="c"># 비브아 프로젝트</span>
+wbl              <span class="c"># wbL 프로젝트</span>
+design-team      <span class="c"># 디자인 팀 일반 사용</span></pre>
+
+        <div class="card" style="margin-top:14px;">
+          <h4>② Claude.ai · Claude Code (구독)</h4>
+          <p style="margin-top:10px;">API 키 대신 <strong>Claude Team 플랜</strong>으로 멤버 관리. 학습 옵트아웃이 기본 적용됩니다.</p>
+          <ul>
+            <li><strong>Admin</strong> — 멤버 초대 · 청구 · 사용량 (L3)</li>
+            <li><strong>Member</strong> — 채팅 · Projects 사용 (L1 · L2)</li>
+            <li>외주(L0)에게는 <strong>일회성 게스트 접근 금지</strong> — 차라리 회사 PC에서 작업하도록</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h4>③ Claude Code CLI 추가 권한 제어</h4>
+          <p style="margin-top:10px;">사용자 PC에서 동작하는 도구라 <code class="inline">.claude/settings.json</code>으로 추가 제어가 가능합니다.</p>
+          <pre class="cmd" style="margin-top:10px;">{
+  <span class="c">// 외주(L0)에게 환경 줄 때 권장 설정</span>
+  "permissions": {
+    "allow": ["Read", "Grep", "Glob"],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Write(.env*)"
+    ],
+    "ask": ["Edit", "Write", "Bash"]
+  }
+}</pre>
+        </div>
+
+        <!-- OpenAI -->
+        <h3 class="sub">OpenAI (ChatGPT · API)</h3>
+        <p>구조는 Anthropic과 유사: <strong>Organization → Projects → Members → API Keys</strong></p>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>W-Island 등급</th><th>OpenAI Role</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>L3</strong> 관리자</td><td>Organization <strong>Owner</strong></td><td>결제 · 멤버 · 모든 Project 관리</td></tr>
+              <tr><td><strong>L2</strong> 팀장급</td><td>Project <strong>Owner</strong></td><td>해당 Project 내 키 발급 · 멤버 관리</td></tr>
+              <tr><td><strong>L1</strong> 일반</td><td>Project <strong>Member</strong></td><td>특정 Project 키 사용</td></tr>
+              <tr><td><strong>L0</strong> 외부</td><td>멤버 초대 X · 키만 전달</td><td>Project 단위 격리 + 만료일</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Settings → Limits에서 Project별 월 한도 · 모델별 한도 · 알림 임계값 설정 가능. ChatGPT Team/Enterprise는 별도 워크스페이스에서 멤버 관리.</p>
+
+        <!-- Google -->
+        <h3 class="sub">Google (Gemini · Cloud)</h3>
+        <p>Google Cloud의 <strong>IAM (Identity and Access Management)</strong>으로 권한 분리. Project 단위로 격리.</p>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>W-Island 등급</th><th>Google Cloud IAM Role</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>L3</strong> 관리자</td><td><strong>Owner</strong> · Billing Administrator</td><td>Project 생성 · 결제 · 모든 권한</td></tr>
+              <tr><td><strong>L2</strong> 팀장급</td><td><strong>Editor</strong> + API Keys Admin</td><td>키 발급 · 리소스 관리</td></tr>
+              <tr><td><strong>L1</strong> 일반</td><td><strong>Viewer</strong> + 특정 API 사용 권한</td><td>키 사용만, 콘솔 변경 X</td></tr>
+              <tr><td><strong>L0</strong> 외부</td><td>Service Account 키만 발급</td><td>만료일 · IP 제한 · scope 최소화</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Gemini Workspace(Google Workspace)는 별도 — 관리자 콘솔에서 사용자 그룹에 Gemini 라이선스 할당.</p>
+
+        <!-- 디자인/생성 도구 -->
+        <h3 class="sub">디자인 · 생성 도구 (Higgsfield · Figma · Freepik)</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h4>Higgsfield</h4>
+            <ul>
+              <li>회사 계정 1개로 통합 운영</li>
+              <li>API 사용 시 키는 L3가 발급 · 보관</li>
+              <li>크레딧 한도 · 사용 이력 주기 점검</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Figma</h4>
+            <ul>
+              <li><strong>Organization · Team</strong> 단위 멤버 관리</li>
+              <li>Admin / Member / Viewer / Guest 역할</li>
+              <li>외주는 <strong>Guest</strong>로 초대 (편집 권한 제한)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Freepik · Canva</h4>
+            <ul>
+              <li>Team 플랜 멤버 초대</li>
+              <li>Admin · Editor · Viewer 구분</li>
+              <li>다운로드 이력 추적 가능</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>기타 SaaS 공통</h4>
+            <ul>
+              <li>회사 도메인 이메일로만 가입</li>
+              <li>SSO 지원 시 회사 SSO로 통일</li>
+              <li>퇴사자 계정 24시간 내 비활성화</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- W-Island 적용 체크리스트 -->
+        <h3 class="sub">W-Island 즉시 적용 체크리스트</h3>
+        <p>L3 관리자가 한 번 세팅하면 이후 운영이 단순해집니다.</p>
+
+        <div class="listrow"><div class="lead">1</div><div class="body"><div class="t">Anthropic Organization 생성 · 회사 카드 등록</div><div class="s">console.anthropic.com → Settings → Organization. Primary Owner는 L3</div></div></div>
+        <div class="listrow"><div class="lead">2</div><div class="body"><div class="t">Claude Team 플랜 가입</div><div class="s">Claude.ai · Claude Code 용. 학습 옵트아웃 자동 적용</div></div></div>
+        <div class="listrow"><div class="lead">3</div><div class="body"><div class="t">Workspace 5개 분리</div><div class="s">ai-hub-prod / ai-hub-dev / vivoir / wbl / design-team</div></div></div>
+        <div class="listrow"><div class="lead">4</div><div class="body"><div class="t">Organization · Workspace별 Spend limit 설정</div><div class="s">전체 한도 + 각 워크스페이스 개별 한도</div></div></div>
+        <div class="listrow"><div class="lead">5</div><div class="body"><div class="t">멤버 초대 · 역할 부여</div><div class="s">L2 팀장 → Admin, L1 직원 → 해당 Workspace Developer</div></div></div>
+        <div class="listrow"><div class="lead">6</div><div class="body"><div class="t">외주(L0) 정책</div><div class="s">멤버 초대 X · 만료일 설정한 키 1개만 전달 · 프로젝트 종료 시 폐기</div></div></div>
+        <div class="listrow"><div class="lead">7</div><div class="body"><div class="t">OpenAI · Google · Higgsfield도 동일 원칙 적용</div><div class="s">Organization → Project → Member 구조로 매핑</div></div></div>
+        <div class="listrow"><div class="lead">8</div><div class="body"><div class="t">한도 알림 Slack 연결</div><div class="s">50/80/100% 도달 시 L2 · L3에게 자동 알림</div></div></div>
+        <div class="listrow"><div class="lead">9</div><div class="body"><div class="t">키 대장 Notion 페이지 만들기</div><div class="s">제공자 · Workspace · 키 이름 · 발급일 · 만료일 · 한도 · 발급자 · 사용자</div></div></div>
+        <div class="listrow"><div class="lead">10</div><div class="body"><div class="t">전 직원 2FA(2단계 인증) ON</div><div class="s">Anthropic · OpenAI · Google · GitHub 모두. 인증 앱(1Password · Authy) 권장</div></div></div>
+
+        <div class="alert info" style="margin-top:18px;">
+          <div><b>한 번에 다 하려고 하지 마세요</b>1~3번까지만 먼저 하고, 나머지는 한 주에 1~2개씩 처리해도 충분합니다. 가장 중요한 건 <strong>L3 관리자 지정</strong>과 <strong>Spend limit 설정</strong>입니다.</div>
         </div>
       </section>
 
