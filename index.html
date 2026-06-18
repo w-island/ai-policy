@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>더블유아일랜드 · AI · API 사용 수칙</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#1577cc" />
+  <meta property="og:title" content="더블유아일랜드 AI · API 사용 수칙" />
+  <meta property="og:description" content="W-Island AI · API Use Policy — 안전하고 일관된 AI 사용을 위한 사내 가이드라인" />
+  <meta property="og:image" content="https://w-island.github.io/ai-policy/icon-512.png" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    /* =========================================================
+       BRAND TOKENS — W-Island Design System
+       ========================================================= */
+    :root {
+      --blue-50:#ebf5fd; --blue-100:#cce6fa; --blue-200:#9fd0f4; --blue-300:#5cb4ee;
+      --blue-400:#1da4ff; --blue-500:#1577cc; --blue-600:#1166b0; --blue-700:#0e5390;
+      --blue-800:#0b4172; --blue-900:#093356;
+
+      --status-positive:#3BCC4B; --status-negative:#d6173a; --status-warning:#e8920c;
+
+      --diff-add-bg:#c5fad7;   --diff-add-txt:#00693d;
+      --diff-remove-bg:#ffc9c7;--diff-remove-txt:#b4002b;
+
+      --r-sm:6px; --r-md:12px; --r-lg:20px;
+      --maxw:980px;
+      --sidebar:248px;
+    }
+
+    [data-theme="light"] {
+      --gray-50:#f9f9fa; --gray-100:#ececf0; --gray-200:#e3e3e8; --gray-300:#d6d7de;
+      --gray-400:#cecfd7; --gray-500:#c2c3cd; --gray-600:#b1b1bb; --gray-700:#8a8a92;
+      --gray-800:#6b6b71; --gray-900:#515256; --gray-1000:#2A2C2F;
+      --g1000-rgb:42,44,47;
+      --surface-1:#ffffff; --surface-2:#f9fafb; --surface-3:#f2f4f6;
+      --txt-link:#1f7a8c;
+      --bg-invert:#2A2C2F;
+      --bg-blue-primary:#cce6fa;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 10px 28px rgba(0,0,0,.10);
+      --shadow-xl:0 20px 48px rgba(0,0,0,.14);
+    }
+    [data-theme="dark"] {
+      --gray-50:#17171c; --gray-100:#202028; --gray-200:#292932; --gray-300:#3c3c46;
+      --gray-400:#4e4e5a; --gray-500:#6b6b78; --gray-600:#8b95a1; --gray-700:#a9adb8;
+      --gray-800:#c2c5cc; --gray-900:#e3e4e8; --gray-1000:#f3f4f6;
+      --g1000-rgb:243,244,246;
+      --surface-1:#202028; --surface-2:#17171c; --surface-3:#292932;
+      --txt-link:#5ec8d2;
+      --bg-invert:#f3f4f6;
+      --bg-blue-primary:#0b4172;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.4);
+      --shadow-md:0 4px 12px rgba(0,0,0,.45);
+      --shadow-lg:0 10px 28px rgba(0,0,0,.5);
+      --shadow-xl:0 20px 48px rgba(0,0,0,.6);
+    }
+
+    :root {
+      --txt-primary:   rgba(var(--g1000-rgb), 1);
+      --txt-secondary: rgba(var(--g1000-rgb), .80);
+      --txt-tertiary:  rgba(var(--g1000-rgb), .60);
+      --txt-caption:   rgba(var(--g1000-rgb), .50);
+      --txt-disabled:  rgba(var(--g1000-rgb), .30);
+      --txt-blue-primary:   var(--blue-500);
+      --txt-blue-secondary: var(--blue-400);
+
+      --bg-primary:   var(--surface-1);
+      --bg-secondary: var(--surface-2);
+      --bg-tertiary:  var(--surface-3);
+
+      --border-primary:   var(--gray-1000);
+      --border-secondary: rgba(var(--g1000-rgb), .20);
+      --border-tertiary:  rgba(var(--g1000-rgb), .10);
+    }
+
+    /* =========================================================
+       BASE
+       ========================================================= */
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Pretendard', system-ui, sans-serif;
+      background:var(--bg-secondary);
+      color:var(--txt-primary);
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      transition:background .25s ease, color .25s ease;
+    }
+    a { color:var(--txt-link); }
+
+    /* Layout */
+    .layout { display:flex; min-height:100vh; }
+    .sidebar {
+      width:var(--sidebar); flex:0 0 var(--sidebar);
+      position:sticky; top:0; align-self:flex-start; height:100vh;
+      overflow-y:auto; padding:28px 18px;
+      background:var(--bg-primary);
+      border-right:1px solid var(--border-tertiary);
+    }
+    .sidebar .logo { display:flex; align-items:center; gap:10px; margin-bottom:24px; }
+    .sidebar .logo img { width:28px; height:28px; object-fit:contain; }
+    .sidebar .logo b { font-size:15px; font-weight:700; letter-spacing:-.01em; }
+    .sidebar .logo .sub { display:block; font-size:11px; font-weight:600; color:var(--txt-tertiary); margin-top:2px; }
+    .nav-group { margin-bottom:18px; }
+    .nav-group > span { display:block; font-size:11px; font-weight:700; letter-spacing:.04em;
+      text-transform:uppercase; color:var(--txt-caption); padding:0 10px; margin-bottom:6px; }
+    .nav-group a { display:block; font-size:13.5px; font-weight:500; color:var(--txt-secondary);
+      text-decoration:none; padding:7px 10px; border-radius:8px; }
+    .nav-group a:hover { background:var(--bg-tertiary); color:var(--txt-primary); }
+    .nav-group a.active { background:var(--bg-blue-primary); color:var(--txt-blue-primary); font-weight:600; }
+    [data-theme="dark"] .nav-group a.active { color:var(--blue-200); }
+
+    .main { flex:1; min-width:0; }
+    .container { max-width:var(--maxw); margin:0 auto; padding:48px 40px 120px; }
+
+    /* Topbar */
+    .topbar { position:sticky; top:0; z-index:5; display:flex; justify-content:space-between; align-items:center;
+      gap:8px; padding:14px 40px; background:color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+      backdrop-filter:blur(8px); border-bottom:1px solid var(--border-tertiary); }
+    .topbar .crumb { font-size:13px; color:var(--txt-tertiary); }
+    .topbar .crumb b { color:var(--txt-secondary); font-weight:600; }
+    .topbar-actions { display:flex; gap:8px; }
+    .theme-btn { display:inline-flex; align-items:center; gap:7px; font-family:inherit;
+      font-size:13px; font-weight:600; color:var(--txt-secondary); cursor:pointer;
+      background:var(--bg-primary); border:1px solid var(--border-secondary);
+      border-radius:999px; padding:7px 14px; }
+    .theme-btn:hover { color:var(--txt-primary); }
+
+    /* Hero */
+    .hero { margin-bottom:56px; }
+    .hero .kicker { font-size:13px; font-weight:600; color:var(--txt-blue-primary); margin-bottom:10px; letter-spacing:.04em; }
+    [data-theme="dark"] .hero .kicker { color:var(--blue-300); }
+    .hero h1 { font-size:40px; font-weight:700; letter-spacing:-.02em; line-height:1.25; }
+    .hero p { margin-top:14px; font-size:16px; color:var(--txt-secondary); max-width:620px; }
+    .hero .meta { margin-top:22px; display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* Section */
+    section { margin-bottom:64px; scroll-margin-top:80px; }
+    .sec-head { margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid var(--border-secondary); }
+    .sec-head h2 { font-size:26px; font-weight:700; letter-spacing:-.015em; }
+    .sec-head p { margin-top:8px; font-size:14.5px; color:var(--txt-secondary); }
+    .sub { font-size:18px; font-weight:700; margin:32px 0 14px; letter-spacing:-.01em; }
+    .sub.first { margin-top:8px; }
+    .note { font-size:13.5px; color:var(--txt-tertiary); margin:8px 0 16px; }
+
+    /* Body text */
+    .container p { font-size:15px; color:var(--txt-secondary); margin-bottom:12px; }
+    .container ul, .container ol { padding-left:22px; margin-bottom:12px; }
+    .container li { font-size:15px; color:var(--txt-secondary); margin-bottom:6px; }
+    .container li::marker { color:var(--txt-tertiary); }
+    .container strong { color:var(--txt-primary); font-weight:700; }
+    .container em { font-style:normal; color:var(--txt-blue-primary); font-weight:600; }
+    [data-theme="dark"] .container em { color:var(--blue-300); }
+
+    /* Card */
+    .card { background:var(--bg-primary); border:1px solid var(--border-tertiary);
+      border-radius:var(--r-md); padding:24px; }
+    .card + .card { margin-top:14px; }
+    .card h4 { font-size:16px; font-weight:700; margin-bottom:8px; }
+
+    /* Principle (numbered Do list) */
+    .principles { display:grid; gap:14px; }
+    .principle { background:var(--bg-primary); border:1px solid var(--border-tertiary);
+      border-radius:12px; padding:20px 22px; }
+    .principle h4 { font-size:16px; font-weight:700; display:flex; gap:10px; align-items:center; }
+    .principle .num { display:inline-flex; align-items:center; justify-content:center;
+      width:24px; height:24px; border-radius:7px; background:var(--blue-500); color:#fff; font-size:13px; font-weight:700; flex:0 0 auto; }
+    .principle p { font-size:14px; color:var(--txt-secondary); margin-top:8px; }
+
+    /* Before/After (Bad/Good) — Don't / Do */
+    .ba { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:14px;
+      border:1px solid var(--border-tertiary); border-radius:10px; overflow:hidden; }
+    .ba > div { padding:16px 18px; }
+    .ba .bad { background:color-mix(in srgb, var(--diff-remove-bg) 22%, var(--bg-primary)); }
+    .ba .good { background:color-mix(in srgb, var(--diff-add-bg) 22%, var(--bg-primary)); border-left:1px solid var(--border-tertiary); }
+    .ba .tag { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
+    .ba .bad .tag { color:var(--diff-remove-txt); }
+    .ba .good .tag { color:var(--diff-add-txt); }
+    .ba p { font-size:13.5px; color:var(--txt-primary); margin:0; line-height:1.6; }
+    @media (max-width:640px){ .ba { grid-template-columns:1fr; } .ba .good { border-left:none; border-top:1px solid var(--border-tertiary); } }
+
+    /* Listrow — checklist style */
+    .listrow { display:flex; align-items:flex-start; gap:14px; padding:16px 18px;
+      background:var(--bg-primary); border:1px solid var(--border-tertiary); }
+    .listrow:first-child { border-radius:12px 12px 0 0; }
+    .listrow:last-child { border-radius:0 0 12px 12px; }
+    .listrow + .listrow { border-top:none; }
+    .listrow .lead { width:34px; height:34px; border-radius:9px; flex:0 0 auto;
+      display:flex; align-items:center; justify-content:center;
+      background:color-mix(in srgb, var(--blue-500) 14%, var(--bg-primary)); color:var(--blue-500); font-weight:700; font-size:13px; }
+    [data-theme="dark"] .listrow .lead { color:var(--blue-200); }
+    .listrow .lead.neg { background:color-mix(in srgb, var(--status-negative) 14%, var(--bg-primary)); color:var(--status-negative); }
+    .listrow .lead.pos { background:color-mix(in srgb, var(--status-positive) 18%, var(--bg-primary)); color:var(--status-positive); }
+    .listrow .body { flex:1; min-width:0; padding-top:5px; }
+    .listrow .body .t { font-size:15px; font-weight:600; color:var(--txt-primary); }
+    .listrow .body .s { font-size:13.5px; color:var(--txt-tertiary); margin-top:4px; line-height:1.55; }
+
+    /* Badge */
+    .badge { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700;
+      padding:4px 11px; border-radius:999px; }
+    .badge.blue { background:color-mix(in srgb, var(--blue-500) 16%, var(--bg-primary)); color:var(--txt-blue-primary); }
+    [data-theme="dark"] .badge.blue { color:var(--blue-200); }
+    .badge.pos { background:color-mix(in srgb, var(--status-positive) 18%, var(--bg-primary)); color:var(--status-positive); }
+    .badge.neg { background:color-mix(in srgb, var(--status-negative) 16%, var(--bg-primary)); color:var(--status-negative); }
+    .badge.warn { background:color-mix(in srgb, var(--status-warning) 18%, var(--bg-primary)); color:#9a6206; }
+    [data-theme="dark"] .badge.warn { color:#f0b35a; }
+    .badge.gray { background:var(--bg-tertiary); color:var(--txt-secondary); }
+
+    /* Alert */
+    .alert { display:flex; gap:10px; padding:14px 16px; border-radius:12px; font-size:14px; align-items:flex-start; line-height:1.55; }
+    .alert .ai { flex:0 0 auto; margin-top:1px; display:flex; }
+    .alert b { font-weight:700; display:block; margin-bottom:2px; }
+    .alert.info { background:var(--bg-blue-primary); color:var(--txt-blue-primary); }
+    [data-theme="dark"] .alert.info { color:var(--blue-200); }
+    .alert.success { background:color-mix(in srgb, var(--status-positive) 16%, var(--bg-primary)); color:var(--status-positive); }
+    .alert.warn { background:color-mix(in srgb, var(--status-warning) 18%, var(--bg-primary)); color:#9a6206; }
+    [data-theme="dark"] .alert.warn { color:#f0b35a; }
+    .alert.error { background:color-mix(in srgb, var(--status-negative) 14%, var(--bg-primary)); color:var(--status-negative); }
+    .alert + .alert { margin-top:10px; }
+
+    /* Table */
+    .tbl-wrap { border:1px solid var(--border-tertiary); border-radius:12px; overflow:hidden; background:var(--bg-primary); }
+    .tbl { width:100%; border-collapse:collapse; font-size:14px; }
+    .tbl th { text-align:left; font-size:12px; font-weight:700; color:var(--txt-tertiary); background:var(--bg-secondary);
+      padding:12px 16px; border-bottom:1px solid var(--border-tertiary); white-space:nowrap; }
+    .tbl td { padding:13px 16px; border-bottom:1px solid var(--border-tertiary); color:var(--txt-primary); vertical-align:top; }
+    .tbl tr:last-child td { border-bottom:none; }
+    .tbl .ok { color:var(--diff-add-txt); font-weight:600; }
+    .tbl .ng { color:var(--diff-remove-txt); font-weight:600; }
+    .tbl .cond { color:#9a6206; font-weight:600; }
+    [data-theme="dark"] .tbl .cond { color:#f0b35a; }
+
+    /* Code/command block */
+    .cmd { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13.5px;
+      background:var(--bg-tertiary); border:1px solid var(--border-tertiary); border-radius:10px;
+      padding:14px 16px; color:var(--txt-primary); white-space:pre; overflow-x:auto; line-height:1.85; margin:0 0 12px; }
+    .cmd .c { color:var(--txt-tertiary); }
+    code.inline { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px;
+      background:var(--bg-tertiary); padding:2px 7px; border-radius:5px; color:var(--txt-primary); }
+
+    /* Buttons */
+    .btn { font-family:inherit; font-weight:600; border:1px solid transparent; border-radius:12px;
+      cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:0 18px; height:44px; font-size:14.5px; transition:.15s; color:var(--txt-primary); text-decoration:none; }
+    .btn.sm { height:36px; font-size:13px; border-radius:10px; padding:0 14px; }
+    .btn-primary { background:var(--blue-500); color:#fff; }
+    .btn-primary:hover { background:var(--blue-600); }
+    .btn-outline { background:transparent; border-color:var(--border-secondary); }
+    .btn-outline:hover { background:var(--bg-tertiary); }
+
+    /* Two-column grid for cards */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:720px) { .grid-2 { grid-template-columns:1fr; } }
+
+    /* Quick TOC chips at hero */
+    .toc-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:24px; }
+    .toc-chips a { font-size:13px; font-weight:600; color:var(--txt-secondary); background:var(--bg-primary);
+      border:1px solid var(--border-tertiary); border-radius:999px; padding:7px 14px; text-decoration:none; }
+    .toc-chips a:hover { color:var(--txt-blue-primary); border-color:var(--blue-300); }
+
+    /* Footer */
+    .footer { border-top:1px solid var(--border-tertiary); padding-top:32px; margin-top:64px;
+      font-size:13px; color:var(--txt-tertiary); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .footer a { color:var(--txt-link); text-decoration:none; }
+    .footer a:hover { text-decoration:underline; }
+
+    /* Mobile */
+    @media (max-width: 860px) {
+      .sidebar { display:none; }
+      .container { padding:32px 22px 80px; }
+      .topbar { padding:12px 22px; }
+      .hero h1 { font-size:30px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- =================== SIDEBAR =================== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="logo-rounded.png" alt="W-Island" />
+      <div>
+        <b>W-ISLAND</b>
+        <span class="sub">AI Policy</span>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-group">
+        <span>시작하기</span>
+        <a href="#overview">개요</a>
+        <a href="#scope">적용 범위</a>
+        <a href="#principles">기본 원칙</a>
+      </div>
+
+      <div class="nav-group">
+        <span>정책</span>
+        <a href="#tools">승인된 도구</a>
+        <a href="#data">입력 금지 데이터</a>
+        <a href="#api">API · 비밀 관리</a>
+        <a href="#code">코드 · GitHub</a>
+        <a href="#agent">코딩 에이전트</a>
+        <a href="#output">결과물 검수</a>
+      </div>
+
+      <div class="nav-group">
+        <span>운영</span>
+        <a href="#incident">사고 대응</a>
+        <a href="#violation">위반 시 조치</a>
+        <a href="#doc">문서 관리</a>
+      </div>
+
+      <div class="nav-group">
+        <span>관련 문서</span>
+        <a href="https://w-island.github.io/style-guide/" target="_blank" rel="noopener">스타일 가이드 ↗</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- =================== MAIN =================== -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="crumb">Policy &nbsp;›&nbsp; <b>AI · API 사용 수칙</b></div>
+      <div class="topbar-actions">
+        <button class="theme-btn" id="themeBtn" type="button" aria-label="테마 전환">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <span id="themeLabel">Light</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- =================== HERO =================== -->
+      <header class="hero">
+        <div class="kicker">W-ISLAND POLICY · v1.0</div>
+        <h1>AI · API 사용 수칙</h1>
+        <p>회사에서 AI 도구를 안전하고 일관되게 사용하기 위한 사내 가이드라인입니다. 보안 사고와 클라이언트 신뢰 손상을 예방하고, 누구나 같은 기준으로 일할 수 있도록 합니다.</p>
+        <div class="meta">
+          <span class="badge blue">v1.0</span>
+          <span class="badge gray">2026-06-18</span>
+          <span class="badge gray">전 직원 · 외주 협업자</span>
+        </div>
+        <div class="toc-chips">
+          <a href="#tools">승인된 도구</a>
+          <a href="#data">입력 금지 데이터</a>
+          <a href="#api">API · 비밀 관리</a>
+          <a href="#code">코드 · GitHub</a>
+          <a href="#output">결과물 검수</a>
+          <a href="#incident">사고 대응</a>
+        </div>
+      </header>
+
+      <!-- =================== OVERVIEW =================== -->
+      <section id="overview">
+        <div class="sec-head">
+          <h2>개요</h2>
+          <p>왜 이 문서가 필요한가</p>
+        </div>
+        <div class="card">
+          <p>AI 도구의 사용량이 빠르게 늘면서, 무분별한 사용으로 인한 <strong>보안 사고 · 클라이언트 자료 유출 · 저작권 문제</strong>가 실제 위험이 되었습니다. 본 수칙은 W-Island 구성원이 AI · API를 사용할 때 지켜야 할 최소한의 기준을 정리합니다.</p>
+          <p>"하지 말 것"을 정하는 것이 목적이 아니라, <em>안전한 사용 범위 안에서 빠르게 일할 수 있도록</em> 공통 기준을 만드는 것이 목적입니다.</p>
+        </div>
+      </section>
+
+      <!-- =================== SCOPE =================== -->
+      <section id="scope">
+        <div class="sec-head">
+          <h2>적용 범위</h2>
+          <p>누가, 어떤 작업에 적용되는가</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h4>대상</h4>
+            <ul>
+              <li>W-Island 전 직원</li>
+              <li>외주 협업자 · 프리랜서</li>
+              <li>인턴 · 단기 계약자</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>프로젝트 범위</h4>
+            <ul>
+              <li>비브아 (VIVOIR PLAY LAB)</li>
+              <li>wbL (주얼리 브랜드)</li>
+              <li>ai-hub · 자사몰 등 자체 프로젝트</li>
+              <li>외부 클라이언트 작업물</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== PRINCIPLES =================== -->
+      <section id="principles">
+        <div class="sec-head">
+          <h2>기본 원칙</h2>
+          <p>모든 세부 규칙은 이 4가지 원칙에서 출발합니다</p>
+        </div>
+        <div class="principles">
+          <div class="principle">
+            <h4><span class="num">1</span> 회사 계정으로만</h4>
+            <p>개인 ChatGPT · Claude 무료 계정으로 회사 일을 하지 않습니다. 학습 옵트아웃이 보장된 회사 플랜(Team / Enterprise)만 사용합니다.</p>
+          </div>
+          <div class="principle">
+            <h4><span class="num">2</span> 의심스러우면 묻기</h4>
+            <p>이 데이터를 AI에 입력해도 되는지 확신이 없다면, 입력 전에 담당자에게 확인합니다. 사후 보고보다 사전 확인이 항상 빠릅니다.</p>
+          </div>
+          <div class="principle">
+            <h4><span class="num">3</span> AI 결과물은 초안</h4>
+            <p>AI가 만든 텍스트 · 이미지 · 코드는 항상 사람이 검수한 뒤 외부로 나갑니다. 클라이언트 작업물은 특히 엄격하게.</p>
+          </div>
+          <div class="principle">
+            <h4><span class="num">4</span> 사용 흔적 남기기</h4>
+            <p>어떤 도구로, 어떤 프롬프트로 만들었는지 추적 가능해야 합니다. 문제가 생겼을 때 원인을 빠르게 찾을 수 있도록.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== TOOLS =================== -->
+      <section id="tools">
+        <div class="sec-head">
+          <h2>승인된 도구 (Whitelist)</h2>
+          <p>업무에 사용할 수 있는 도구 목록입니다. 새 도구 도입은 신청 후 검토를 거칩니다.</p>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>카테고리</th>
+                <th>승인</th>
+                <th>조건부</th>
+                <th>금지</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>챗봇 · LLM</strong></td>
+                <td class="ok">ChatGPT Team, Claude Pro · Team, Gemini Workspace</td>
+                <td class="cond">—</td>
+                <td class="ng">무료 ChatGPT(개인), 출처 불명 챗봇 사이트</td>
+              </tr>
+              <tr>
+                <td><strong>이미지 · 영상</strong></td>
+                <td class="ok">Higgsfield, Freepik AI, Photoshop · Firefly</td>
+                <td class="cond">Midjourney (회사 계정만)</td>
+                <td class="ng">출처 불명 생성기, 개인 계정 사용</td>
+              </tr>
+              <tr>
+                <td><strong>코딩</strong></td>
+                <td class="ok">Claude Code, Cursor, Copilot Business</td>
+                <td class="cond">—</td>
+                <td class="ng">개인 Copilot으로 회사 코드 작업</td>
+              </tr>
+              <tr>
+                <td><strong>디자인</strong></td>
+                <td class="ok">Figma AI</td>
+                <td class="cond">Canva AI</td>
+                <td class="ng">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">새 도구 도입 절차</h3>
+        <div class="listrow"><div class="lead">1</div><div class="body"><div class="t">담당자에게 신청</div><div class="s">도구 이름 · 사용 목적 · 요금제 정보를 함께 제출</div></div></div>
+        <div class="listrow"><div class="lead">2</div><div class="body"><div class="t">약관 · 학습 정책 검토</div><div class="s">입력 데이터가 학습에 사용되는지, 옵트아웃 가능한지 확인</div></div></div>
+        <div class="listrow"><div class="lead">3</div><div class="body"><div class="t">승인 후 Whitelist 추가</div><div class="s">전사 공지 후 도구 목록 업데이트</div></div></div>
+      </section>
+
+      <!-- =================== DATA =================== -->
+      <section id="data">
+        <div class="sec-head">
+          <h2>입력 금지 데이터</h2>
+          <p>아래 데이터는 AI 도구에 입력 · 업로드하지 않습니다.</p>
+        </div>
+
+        <div class="alert error" style="margin-bottom:18px;">
+          <div><b>주의</b>한 번 입력된 데이터는 회수가 불가능합니다. 입력 전에 반드시 확인해주세요.</div>
+        </div>
+
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">클라이언트 미공개 자료 · NDA 대상</div><div class="s">계약서 · 시안 · 촬영 원본 · 미공개 제품 정보</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">비브아 · wbL 미공개 자료</div><div class="s">출시 전 제품 이미지, 미공개 디자인, 촬영본, 마케팅 캘린더</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">고객 개인정보 · 주문 데이터</div><div class="s">이름 · 연락처 · 주소 · 결제 정보 · CS 문의 내용</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">재무 · 인사 자료</div><div class="s">매출 · 정산 · 견적서 · 급여 · 직원 개인정보</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">시스템 접속 정보</div><div class="s">API 키 · 비밀번호 · DB 접속 정보 · 토큰</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">자사몰 운영 데이터</div><div class="s">wblbeauty.com 주문 · 회원 · 매출 데이터</div></div></div>
+
+        <h3 class="sub">Do / Don't 예시</h3>
+        <div class="ba">
+          <div class="bad">
+            <div class="tag">Don't</div>
+            <p>"이 클라이언트 시안 어때?" — 시안 PDF를 무료 ChatGPT에 업로드</p>
+          </div>
+          <div class="good">
+            <div class="tag">Do</div>
+            <p>회사 Claude Team 계정 사용 + 클라이언트가 AI 사용을 허용했는지 사전 확인</p>
+          </div>
+        </div>
+        <div class="ba">
+          <div class="bad">
+            <div class="tag">Don't</div>
+            <p>"이 코드 디버깅해줘" — DB 비밀번호가 포함된 코드를 그대로 붙여넣기</p>
+          </div>
+          <div class="good">
+            <div class="tag">Do</div>
+            <p>비밀번호 · 키 부분은 <code class="inline">[REDACTED]</code> 로 치환한 뒤 질문</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== API =================== -->
+      <section id="api">
+        <div class="sec-head">
+          <h2>API · 비밀 관리</h2>
+          <p>키 하나가 유출되면 청구서 · 데이터 양쪽 모두 위험합니다. 가장 엄격하게 관리합니다.</p>
+        </div>
+
+        <h3 class="sub first">저장 · 공유</h3>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">.env 파일에 저장 · .gitignore 등록</div><div class="s">소스 코드에 키를 직접 박지 않습니다. .env 가 GitHub에 올라가지 않도록 반드시 .gitignore 에 등록</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">팀 공유는 1Password · Bitwarden 사용</div><div class="s">카카오톡 · 슬랙 DM · 이메일로 키 전달 금지</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">회사용 · 개인용 키 분리</div><div class="s">회사 결제 카드로 발급한 키와 개인 키를 섞지 않습니다</div></div></div>
+
+        <h3 class="sub">발급 · 회수</h3>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">키 대장 (Notion) 운영</div><div class="s">누가 · 어떤 키 · 어디에 사용 · 발급일 · 한도 — 한 표에서 관리</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">월 사용 한도(Spending limit) 필수 설정</div><div class="s">OpenAI · Anthropic · Google 모두 한도 설정 기능 제공. 무한 청구 방지의 마지노선</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">권한 최소화</div><div class="s">read-only 로 충분하면 write 권한 부여 X. 키 범위(scope)는 좁게</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">퇴사 · 외주 종료 시 24시간 내 회수</div><div class="s">담당자가 즉시 폐기 · 재발급. 키 대장에 회수 기록</div></div></div>
+
+        <h3 class="sub">.gitignore 예시</h3>
+        <pre class="cmd"><span class="c"># .gitignore 에 반드시 포함</span>
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials.json
+secrets/</pre>
+
+        <div class="alert warn">
+          <div><b>키 노출이 의심되면</b>즉시 해당 키를 폐기 · 재발급하고 담당자에게 보고합니다. GitHub에 올라간 키는 1분 안에 자동 봇이 훔쳐가서 청구서가 폭발할 수 있습니다.</div>
+        </div>
+      </section>
+
+      <!-- =================== CODE =================== -->
+      <section id="code">
+        <div class="sec-head">
+          <h2>코드 · GitHub</h2>
+          <p>회사 코드를 AI에 붙여넣을 때, 그리고 저장소 운영 시 지킬 규칙입니다.</p>
+        </div>
+
+        <h3 class="sub first">코드를 AI에 붙여넣을 때</h3>
+        <div class="card">
+          <ul>
+            <li>승인된 도구(Claude Code · Cursor · Copilot Business 등)에서만 작업</li>
+            <li>붙여넣기 <strong>전</strong>에 체크 — API 키 · 비밀번호 · 고객 데이터 · NDA 코드 포함 여부</li>
+            <li>외부 클라이언트 코드는 클라이언트의 AI 사용 허용 여부를 먼저 확인</li>
+            <li>실험은 회사 격리 저장소에서, 운영 코드는 정식 PR로</li>
+          </ul>
+        </div>
+
+        <h3 class="sub">GitHub 저장소 필수 설정</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>설정</th><th>상태</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Secret Scanning</td><td class="ok">필수 ON</td><td>키 노출 시 자동 알림 (무료)</td></tr>
+              <tr><td>Push Protection</td><td class="ok">필수 ON</td><td>키 포함된 푸시를 사전에 차단</td></tr>
+              <tr><td>Dependabot Alerts</td><td class="ok">필수 ON</td><td>취약 패키지 자동 알림</td></tr>
+              <tr><td>Branch Protection (main)</td><td class="ok">필수 ON</td><td>직접 push 금지 · PR 리뷰 필수</td></tr>
+              <tr><td>2FA (조직 멤버)</td><td class="ok">필수 ON</td><td>w-island 조직 전원 2단계 인증</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">AI 생성 코드 검수</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h4>의존성 검토</h4>
+            <p>AI가 추천하는 패키지명이 실제로 존재하는지 확인. 가짜 패키지명을 노린 악성 패키지 침투(slopsquatting) 사례가 늘고 있습니다.</p>
+          </div>
+          <div class="card">
+            <h4>라이선스 확인</h4>
+            <p>GPL 등 전염성 라이선스 코드를 그대로 가져다 쓰면 회사 코드도 공개해야 할 수 있습니다.</p>
+          </div>
+          <div class="card">
+            <h4>보안 취약점</h4>
+            <p>SQL injection · XSS · 인증 우회 같은 기본 취약점은 AI도 자주 만듭니다. PR 리뷰에서 점검.</p>
+          </div>
+          <div class="card">
+            <h4>사람의 리뷰</h4>
+            <p>AI가 작성한 코드도 머지 전 사람이 반드시 리뷰. 자동 머지 금지.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== AGENT =================== -->
+      <section id="agent">
+        <div class="sec-head">
+          <h2>코딩 에이전트 (Claude Code · Cursor)</h2>
+          <p>자동 실행 권한이 있어서 일반 챗봇보다 더 엄격하게 다룹니다.</p>
+        </div>
+
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">운영(production) 환경 접근 금지</div><div class="s">로컬 · 개발 환경에서만 실행. 운영 DB · 운영 서버 직접 접근 금지</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">자동 승인(YOLO) 모드 금지</div><div class="s">명령마다 사람이 확인하는 모드 권장. 권한 확장 명령은 특히 직접 확인</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">위험 명령은 사람이 직접</div><div class="s">rm -rf · DB drop · force push · 키 회수 · 사용자 삭제 등</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">출처 불명 MCP 서버 연결 금지</div><div class="s">시스템 권한을 가져갈 수 있음. 출처 · 코드 · 권한 범위 확인 후 추가</div></div></div>
+        <div class="listrow"><div class="lead neg">×</div><div class="body"><div class="t">.env · 비밀 파일 폴더에서 실행 금지</div><div class="s">에이전트가 의도치 않게 파일을 읽거나 외부에 노출시킬 위험</div></div></div>
+
+        <div class="alert info" style="margin-top:18px;">
+          <div><b>권장 작업 패턴</b>에이전트에 작업을 맡길 때는 ① 작업 폴더를 격리 ② 변경 사항을 git diff 로 확인 ③ 테스트 통과 후 PR ④ 사람이 머지 — 4단계를 지켜주세요.</div>
+        </div>
+      </section>
+
+      <!-- =================== OUTPUT =================== -->
+      <section id="output">
+        <div class="sec-head">
+          <h2>결과물 검수</h2>
+          <p>AI 결과물이 외부로 나가기 전 확인할 사항입니다.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h4>이미지 · 영상</h4>
+            <ul>
+              <li><strong>wbL 콘텐츠 실사 원칙 유지</strong> — 모델 · 제품 이미지는 AI 생성 금지, 실사 사용</li>
+              <li>상표 · 인물 · 작품 침해 여부 확인</li>
+              <li>손가락 · 텍스트 · 로고 왜곡 등 AI 흔적 점검</li>
+              <li>출처(어떤 툴, 어떤 프롬프트) 기록</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>텍스트 · 카피</h4>
+            <ul>
+              <li>사실관계 확인 (가격 · 일정 · 수치)</li>
+              <li>브랜드 톤 일치 (비브아 / wbL 별도 톤)</li>
+              <li>외국어 카피는 원어민 또는 별도 검수</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>코드</h4>
+            <ul>
+              <li>PR 리뷰 후 머지</li>
+              <li>테스트 통과 확인</li>
+              <li>의존성 · 라이선스 점검</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>클라이언트 작업물</h4>
+            <ul>
+              <li>클라이언트의 AI 사용 동의 사전 확인</li>
+              <li>납품 시 AI 사용 범위 고지 (계약에 따름)</li>
+              <li>최종 결과물은 사람이 책임 검수</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub">AI 사용 표기</h3>
+        <p>외부 발행물에 AI 사용을 표기할지 여부는 브랜드 · 채널별로 다릅니다. 별도 가이드(브랜드별)를 따릅니다.</p>
+      </section>
+
+      <!-- =================== INCIDENT =================== -->
+      <section id="incident">
+        <div class="sec-head">
+          <h2>사고 대응</h2>
+          <p>키 노출 · 데이터 유출 의심 시 행동 순서입니다.</p>
+        </div>
+
+        <div class="listrow"><div class="lead">1</div><div class="body"><div class="t">즉시 보고</div><div class="s">담당자(<em>지정 필요</em>)에게 슬랙 · 전화로 즉시 알림. "확실하지 않아서"라는 이유로 늦추지 않습니다</div></div></div>
+        <div class="listrow"><div class="lead">2</div><div class="body"><div class="t">노출 자산 차단</div><div class="s">노출된 키 즉시 폐기 · 재발급. 관련 세션 · 토큰 무효화</div></div></div>
+        <div class="listrow"><div class="lead">3</div><div class="body"><div class="t">유출 범위 파악</div><div class="s">어디까지 공유됐는지 · 누가 봤는지 · 학습에 사용될 가능성 점검</div></div></div>
+        <div class="listrow"><div class="lead">4</div><div class="body"><div class="t">클라이언트 관련 시 고지</div><div class="s">클라이언트 자료가 포함되면 빠르게 사실 고지. 늦은 고지가 더 큰 신뢰 손상</div></div></div>
+        <div class="listrow"><div class="lead">5</div><div class="body"><div class="t">재발 방지책 문서화</div><div class="s">사고 원인 · 대응 · 재발 방지책을 본 수칙에 반영. 같은 사고를 반복하지 않습니다</div></div></div>
+      </section>
+
+      <!-- =================== VIOLATION =================== -->
+      <section id="violation">
+        <div class="sec-head">
+          <h2>위반 시 조치</h2>
+          <p>처벌이 목적이 아니라 재발 방지가 목적입니다.</p>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>단계</th><th>대상</th><th>조치</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>1차</strong></td><td>경미한 위반 · 최초 위반</td><td>경고 + 재교육</td></tr>
+              <tr><td><strong>2차</strong></td><td>반복 위반</td><td>책임자 면담 + 사용 권한 일부 제한</td></tr>
+              <tr><td><strong>중대</strong></td><td>고의 · 클라이언트 피해 · 대규모 유출</td><td>인사 조치 · 법적 검토</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- =================== DOC =================== -->
+      <section id="doc">
+        <div class="sec-head">
+          <h2>문서 관리</h2>
+          <p>이 수칙은 살아있는 문서입니다. AI 환경 변화에 맞춰 정기적으로 업데이트합니다.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h4>담당자</h4>
+            <p><em>지정 필요</em> — AI 사용 정책 책임자 1명을 정해 사고 보고를 받습니다.</p>
+          </div>
+          <div class="card">
+            <h4>검토 주기</h4>
+            <p>분기 1회 정기 검토 + 사고 발생 시 즉시 업데이트</p>
+          </div>
+          <div class="card">
+            <h4>버전 관리</h4>
+            <p>변경 사항은 GitHub 저장소에 기록 · 주요 변경은 전사 공지</p>
+          </div>
+          <div class="card">
+            <h4>피드백</h4>
+            <p>규칙이 현실과 안 맞을 때는 담당자에게 의견을 보내주세요. 문서가 사람을 막는 게 아니라 돕도록.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== FOOTER =================== -->
+      <footer class="footer">
+        <div>
+          © W-Island · AI · API 사용 수칙 v1.0 · 2026-06-18
+        </div>
+        <div>
+          <a href="https://w-island.github.io/style-guide/" target="_blank" rel="noopener">스타일 가이드</a>
+          &nbsp;·&nbsp;
+          <a href="https://github.com/w-island/ai-policy" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Theme toggle
+  (function(){
+    const btn = document.getElementById('themeBtn');
+    const label = document.getElementById('themeLabel');
+    const root = document.documentElement;
+    const saved = localStorage.getItem('wisland-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); label.textContent = 'Dark'; }
+    btn.addEventListener('click', () => {
+      const cur = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', cur);
+      label.textContent = cur.charAt(0).toUpperCase() + cur.slice(1);
+      localStorage.setItem('wisland-theme', cur);
+    });
+  })();
+
+  // Sidebar active highlight on scroll
+  (function(){
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.sidebar .nav-group a[href^="#"]');
+    const linkMap = {};
+    links.forEach(a => { linkMap[a.getAttribute('href').slice(1)] = a; });
+    const onScroll = () => {
+      let current = '';
+      sections.forEach(sec => {
+        const top = sec.getBoundingClientRect().top;
+        if (top < 120) current = sec.id;
+      });
+      links.forEach(a => a.classList.remove('active'));
+      if (current && linkMap[current]) linkMap[current].classList.add('active');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+
+</body>
+</html>
