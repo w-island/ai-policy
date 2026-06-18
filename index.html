@@ -315,7 +315,6 @@
       <div class="nav-group">
         <span>운영</span>
         <a href="#incident">사고 대응</a>
-        <a href="#violation">위반 시 조치</a>
         <a href="#doc">문서 관리</a>
       </div>
 
@@ -526,17 +525,156 @@
           <p>키 하나가 유출되면 청구서 · 데이터 양쪽 모두 위험합니다. 가장 엄격하게 관리합니다.</p>
         </div>
 
-        <h3 class="sub first">저장 · 공유</h3>
+        <!-- 권한 등급 -->
+        <h3 class="sub first">권한 등급 (Role-based Access)</h3>
+        <p>키 발급 · 사용 · 콘솔 접근 권한을 4단계로 분리합니다. 등급이 높을수록 책임도 큽니다.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>등급</th>
+                <th>대상</th>
+                <th>키 발급</th>
+                <th>키 사용</th>
+                <th>콘솔 접근</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>L3 · 관리자</strong></td>
+                <td>대표 · 정책 책임자</td>
+                <td class="ok">○ 최종 승인</td>
+                <td class="ok">○</td>
+                <td class="ok">전체</td>
+              </tr>
+              <tr>
+                <td><strong>L2 · 팀장급</strong></td>
+                <td>각 팀 리더 · 시니어</td>
+                <td class="cond">신청 · L3 승인 후</td>
+                <td class="ok">○</td>
+                <td class="cond">팀 범위</td>
+              </tr>
+              <tr>
+                <td><strong>L1 · 일반</strong></td>
+                <td>전 직원 (디자이너 · 기획자 등)</td>
+                <td class="ng">×</td>
+                <td class="ok">발급된 키만 사용</td>
+                <td class="ng">×</td>
+              </tr>
+              <tr>
+                <td><strong>L0 · 외부</strong></td>
+                <td>외주 · 인턴 · 단기 계약자</td>
+                <td class="ng">×</td>
+                <td class="cond">제한 키 · 만료일 필수</td>
+                <td class="ng">×</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">키 신규 발급은 <strong>L2 팀장급 이상</strong>만 신청할 수 있으며, 최종 승인은 <strong>L3 관리자</strong>가 합니다. L1 일반 직원은 이미 발급된 키를 받아서 사용만 합니다.</p>
+
+        <!-- 키 발급 절차 -->
+        <h3 class="sub">키 발급 절차</h3>
+        <div class="listrow"><div class="lead">1</div><div class="body"><div class="t">신청서 제출 (L1 · L2)</div><div class="s">사용 목적 · 예상 사용량 · 사용 기간 · 환경(prod / dev) · 권한 범위(scope) 명시. Notion 양식 사용</div></div></div>
+        <div class="listrow"><div class="lead">2</div><div class="body"><div class="t">L2 팀장 1차 검토</div><div class="s">기술적 필요성 · 권한 범위 · 대안(기존 키 활용) 검토</div></div></div>
+        <div class="listrow"><div class="lead">3</div><div class="body"><div class="t">L3 관리자 최종 승인</div><div class="s">비용 한도 · 보안 영향 확인 후 발급. 운영 키는 반드시 L3가 직접 발급</div></div></div>
+        <div class="listrow"><div class="lead">4</div><div class="body"><div class="t">키 대장 등록</div><div class="s">발급자 · 사용자 · 키 종류 · 환경 · 한도 · 발급일 · 만료일을 Notion 키 대장에 기록</div></div></div>
+
+        <!-- 환경별 키 분리 -->
+        <h3 class="sub">환경별 키 분리</h3>
+        <p>운영 · 개발 · 테스트 환경의 키를 절대 섞지 않습니다. 하나의 키가 모든 환경을 커버하지 않도록 합니다.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>환경</th><th>용도</th><th>한도 (참고)</th><th>접근 가능자</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Production</strong></td><td>운영 서비스 (ai-hub, 자사몰 등 실제 사용자 노출)</td><td>실 사용량 기반 · 알림 필수</td><td>L2 이상 + 운영 담당자</td></tr>
+              <tr><td><strong>Staging</strong></td><td>배포 전 검증 환경</td><td>월 $50 ~ $100</td><td>L1 이상</td></tr>
+              <tr><td><strong>Development</strong></td><td>개발 · 디버깅 · 학습 · 실험</td><td>월 $20 ~ $50</td><td>L1 이상</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert warn" style="margin-top:14px;">
+          <div><b>운영 키는 로컬 PC에서 사용 금지</b>개발 · 디버깅 · 실험은 반드시 development 키로. 운영 키는 운영 서버의 환경변수에만 존재해야 합니다.</div>
+        </div>
+
+        <!-- 계정 · 콘솔 보안 -->
+        <h3 class="sub">계정 · 콘솔 보안</h3>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">API 콘솔 2단계 인증(2FA) 필수</div><div class="s">OpenAI · Anthropic · Google Cloud · GitHub 모두 2FA ON. SMS보다 인증 앱(Authy · 1Password · Google Authenticator) 권장</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">결제 계정은 회사 명의로 1~2개만</div><div class="s">개인 명의 계정으로 회사 키 발급 금지. 퇴사 시 계정 인수가 불가능하고 결제 정보가 개인에게 묶이는 문제 발생</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">제공자별 Organization · Project 단위로 분리</div><div class="s">OpenAI Organization, Anthropic Workspace, Google Cloud Project를 프로젝트별로 분리해서 사용량 · 권한을 격리</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">콘솔 직접 접근은 L2 이상</div><div class="s">L1 일반 직원은 발급된 키만 사용. 콘솔에서 키 발급 · 한도 변경 · 멤버 초대 권한은 팀장급 이상</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">IP 제한 · 호출 출처 제한 적용</div><div class="s">제공자가 지원하는 경우 회사 · 운영 서버 IP만 허용. 모바일 앱이라면 도메인 · 패키지명 제한 활용</div></div></div>
+
+        <!-- 저장 · 공유 -->
+        <h3 class="sub">저장 · 공유</h3>
         <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">.env 파일에 저장 · .gitignore 등록</div><div class="s">소스 코드에 키를 직접 박지 않습니다. .env 가 GitHub에 올라가지 않도록 반드시 .gitignore 에 등록</div></div></div>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">팀 공유는 1Password · Bitwarden 사용</div><div class="s">카카오톡 · 슬랙 DM · 이메일로 키 전달 금지</div></div></div>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">회사용 · 개인용 키 분리</div><div class="s">회사 결제 카드로 발급한 키와 개인 키를 섞지 않습니다</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">팀 공유는 1Password · Bitwarden 만 사용</div><div class="s">카카오톡 · 슬랙 DM · 이메일 · Notion 본문에 키 평문 전달 금지. 비밀 관리 도구만 사용</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">권한 최소화 (Least Privilege)</div><div class="s">read-only 로 충분하면 write 권한 X. 키 scope · 호출 가능 모델 · 호출 가능 메서드를 가능한 좁게 설정</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">운영 키는 비밀 관리 서비스에 보관</div><div class="s">중요 운영 키는 1Password Vault · AWS Secrets Manager · GitHub Encrypted Secrets 등 전용 저장소 사용</div></div></div>
 
-        <h3 class="sub">발급 · 회수</h3>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">키 대장 (Notion) 운영</div><div class="s">누가 · 어떤 키 · 어디에 사용 · 발급일 · 한도 — 한 표에서 관리</div></div></div>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">월 사용 한도(Spending limit) 필수 설정</div><div class="s">OpenAI · Anthropic · Google 모두 한도 설정 기능 제공. 무한 청구 방지의 마지노선</div></div></div>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">권한 최소화</div><div class="s">read-only 로 충분하면 write 권한 부여 X. 키 범위(scope)는 좁게</div></div></div>
-        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">퇴사 · 외주 종료 시 24시간 내 회수</div><div class="s">담당자가 즉시 폐기 · 재발급. 키 대장에 회수 기록</div></div></div>
+        <!-- 모니터링 · 한도 -->
+        <h3 class="sub">모니터링 · 한도</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h4>사용 한도 (Spending Limit)</h4>
+            <ul>
+              <li>모든 키에 월 사용 한도 <strong>필수</strong> 설정</li>
+              <li>예상 사용량의 <strong>1.5배</strong> 정도가 적정</li>
+              <li>한도 도달 시 자동 차단되도록 hard limit 설정</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>알림 임계값</h4>
+            <ul>
+              <li>한도의 <strong>50% · 80% · 100%</strong>에 자동 알림</li>
+              <li>Slack · 이메일로 L2 · L3에게 전달</li>
+              <li>평소 대비 <strong>3배 이상</strong> 급증 시 즉시 알림</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>주간 리뷰 (L2 담당)</h4>
+            <ul>
+              <li>매주 월요일 사용량 리포트 확인</li>
+              <li>예상 외 호출 패턴 · 비활성 키 점검</li>
+              <li>이상 발견 시 L3에 즉시 보고</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>감사 로그 (Audit Log)</h4>
+            <ul>
+              <li>키 발급 · 회수 · 권한 변경 이력 영구 보존</li>
+              <li>분기 1회 L3가 전체 키 · 사용 패턴 검토</li>
+              <li>이상 사용 발견 시 즉시 조사 · 폐기</li>
+            </ul>
+          </div>
+        </div>
 
+        <!-- 정기 로테이션 -->
+        <h3 class="sub">정기 로테이션 (Key Rotation)</h3>
+        <p>키는 주기적으로 폐기 · 재발급합니다. 오래된 키일수록 노출 가능성이 누적됩니다.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>키 종류</th><th>주기</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>운영 키 (Production)</strong></td><td>3개월</td><td>분기마다 재발급 · 무중단 전환 (이전 키 1주 병행)</td></tr>
+              <tr><td><strong>개발 · 테스트 키</strong></td><td>6개월</td><td>반기마다 재발급</td></tr>
+              <tr><td><strong>외부 협업자 키 (L0)</strong></td><td>프로젝트 종료 시 즉시</td><td>최대 3개월 만료 강제</td></tr>
+              <tr><td><strong>의심 상황 발생 시</strong></td><td>즉시</td><td>주기와 무관하게 폐기 · 재발급</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 회수 · 폐기 -->
+        <h3 class="sub">회수 · 폐기</h3>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">퇴사 · 외주 종료 시 24시간 내 회수</div><div class="s">L3 관리자가 즉시 폐기 · 재발급. 키 대장에 회수 기록 · 회수자 서명</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">프로젝트 종료 시 즉시 회수</div><div class="s">관련 키는 모두 폐기. 같은 키를 다른 프로젝트에 재사용 금지</div></div></div>
+        <div class="listrow"><div class="lead pos">✓</div><div class="body"><div class="t">노출 의심 시 "묻지 마" 폐기</div><div class="s">확실하지 않아도 의심되면 즉시 폐기. 늦은 폐기가 가장 큰 비용</div></div></div>
+
+        <!-- .gitignore -->
         <h3 class="sub">.gitignore 예시</h3>
         <pre class="cmd"><span class="c"># .gitignore 에 반드시 포함</span>
 .env
@@ -545,10 +683,11 @@
 *.pem
 *.key
 credentials.json
-secrets/</pre>
+secrets/
+config/secrets.*</pre>
 
         <div class="alert warn">
-          <div><b>키 노출이 의심되면</b>즉시 해당 키를 폐기 · 재발급하고 담당자에게 보고합니다. GitHub에 올라간 키는 1분 안에 자동 봇이 훔쳐가서 청구서가 폭발할 수 있습니다.</div>
+          <div><b>키 노출이 의심되면</b>즉시 해당 키를 폐기 · 재발급하고 L3 담당자에게 보고합니다. GitHub에 올라간 키는 1분 안에 자동 봇이 훔쳐가서 청구서가 폭발할 수 있습니다.</div>
         </div>
       </section>
 
@@ -683,26 +822,6 @@ secrets/</pre>
         <div class="listrow"><div class="lead">3</div><div class="body"><div class="t">유출 범위 파악</div><div class="s">어디까지 공유됐는지 · 누가 봤는지 · 학습에 사용될 가능성 점검</div></div></div>
         <div class="listrow"><div class="lead">4</div><div class="body"><div class="t">클라이언트 관련 시 고지</div><div class="s">클라이언트 자료가 포함되면 빠르게 사실 고지. 늦은 고지가 더 큰 신뢰 손상</div></div></div>
         <div class="listrow"><div class="lead">5</div><div class="body"><div class="t">재발 방지책 문서화</div><div class="s">사고 원인 · 대응 · 재발 방지책을 본 수칙에 반영. 같은 사고를 반복하지 않습니다</div></div></div>
-      </section>
-
-      <!-- =================== VIOLATION =================== -->
-      <section id="violation">
-        <div class="sec-head">
-          <h2>위반 시 조치</h2>
-          <p>처벌이 목적이 아니라 재발 방지가 목적입니다.</p>
-        </div>
-        <div class="tbl-wrap">
-          <table class="tbl">
-            <thead>
-              <tr><th>단계</th><th>대상</th><th>조치</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>1차</strong></td><td>경미한 위반 · 최초 위반</td><td>경고 + 재교육</td></tr>
-              <tr><td><strong>2차</strong></td><td>반복 위반</td><td>책임자 면담 + 사용 권한 일부 제한</td></tr>
-              <tr><td><strong>중대</strong></td><td>고의 · 클라이언트 피해 · 대규모 유출</td><td>인사 조치 · 법적 검토</td></tr>
-            </tbody>
-          </table>
-        </div>
       </section>
 
       <!-- =================== DOC =================== -->
